@@ -12,8 +12,12 @@ public class WorkerNode {
         this.id = id;
         this.scheduler = scheduler;
     }
+    public void sendHeartbeat(){
+        scheduler.hertbeat(id);
+    }
 
     public void pollForJobs(){
+        sendHeartbeat();
         Job job = scheduler.getNextJob();
         if(job != null){
             System.out.println("Worker " + id + " executing job: " + job.getId());
