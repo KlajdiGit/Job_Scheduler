@@ -52,4 +52,20 @@ public class Scheduler {
             }
         }
     }
+
+    public void startMonitoring(){
+
+        new Thread(() -> {
+            while(true){
+                checkForDeadWorkers();
+
+                try{
+                    Thread.sleep(3000);
+                } catch(InterruptedException e){
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+    }
 }

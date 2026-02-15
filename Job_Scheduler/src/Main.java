@@ -19,13 +19,15 @@ public class Main {
         scheduler.registerWorker("worker-1");
         scheduler.registerWorker("worker-2");
 
+        scheduler.startMonitoring();
+
         worker1.start();
         worker2.start();
-
-
-        while(true){
+        
+        /*while(true){
             Thread.sleep(3000);
             scheduler.checkForDeadWorkers();
-        }
+        }*/
+
     }
 }
