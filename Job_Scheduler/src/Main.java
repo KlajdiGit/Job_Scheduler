@@ -12,16 +12,20 @@ public class Main {
         scheduler.submitJob(new Job("job1", "payload1"));
         scheduler.submitJob(new Job("job2", "payload2"));
 
-        WorkerNode worker = new WorkerNode("worker-1", scheduler);
+        WorkerNode worker1 = new WorkerNode("worker-1", scheduler);
+        WorkerNode worker2 = new WorkerNode("worker-2", scheduler);
+
 
         scheduler.registerWorker("worker-1");
+        scheduler.registerWorker("worker-2");
 
-        worker.pollForJobs();
-        worker.pollForJobs();
-        worker.pollForJobs();
+        worker1.start();
+        worker2.start();
 
-        Thread.sleep(6000);
 
-        scheduler.checkForDeadWorkers();
+        while(true){
+            Thread.sleep(3000);
+            scheduler.checkForDeadWorkers();
+        }
     }
 }

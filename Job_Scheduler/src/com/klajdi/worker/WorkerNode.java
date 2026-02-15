@@ -26,6 +26,20 @@ public class WorkerNode {
         } else{
             System.out.println("Worker " + id + "  didn't find this jobs.");
         }
+    }
 
+    public void start(){
+        new Thread(() -> {
+            while(true) {
+                sendHeartbeat();
+                pollForJobs();
+
+                try{
+                    Thread.sleep(2000);
+                } catch(InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 }
