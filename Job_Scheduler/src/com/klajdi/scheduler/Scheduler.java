@@ -15,6 +15,10 @@ public class Scheduler {
     private Map<String, WorkerInfo> workers = new HashMap<>();
 
 
+    public WorkerInfo getWorkerInfo(String workerId) {
+        return workers.get(workerId);
+    }
+
     public void submitJob(Job job){
         jobQueue.add(job);
         System.out.println("Job submitted: " + job.getId());
@@ -49,6 +53,13 @@ public class Scheduler {
             long last = info.getLastHeartbeat();
             if(now - last > WORKER_TIMEOUT_MS){
                 System.out.println("Scheduler: Worker " + workerId + " is DEAD (no heartbeat)");
+
+                if(info.getCurrentJob() != null){
+                    Job job = info.getCurrentJob();
+                    jobQueue.add(job);
+                    System.out.println("Scheduler: Requeued job " + job.getId() + " from dead worker " + workerId);
+                    info.setCurrentJob(null);
+                }
             }
         }
     }

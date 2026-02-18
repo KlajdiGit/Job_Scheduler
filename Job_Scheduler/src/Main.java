@@ -23,11 +23,5 @@ public class Main {
 
         worker1.start();
         worker2.start();
-        
-        /*while(true){
-            Thread.sleep(3000);
-            scheduler.checkForDeadWorkers();
-        }*/
-
     }
 }

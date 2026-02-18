@@ -5,6 +5,7 @@ import java.util.Formatter;
 public class WorkerInfo {
     private String id;
     private long lastHeartbeat;
+    private Job currentJob;
 
     public WorkerInfo(String id){
         this.id = id;
@@ -21,5 +22,13 @@ public class WorkerInfo {
 
     public void updateHeartbeat(){
         this.lastHeartbeat = System.currentTimeMillis();
+    }
+
+    public Job getCurrentJob() {
+        return currentJob;
+    }
+
+    public void setCurrentJob(Job currentJob) {
+        this.currentJob = currentJob;
     }
 }
