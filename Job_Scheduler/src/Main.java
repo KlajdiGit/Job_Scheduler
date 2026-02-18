@@ -1,11 +1,17 @@
 
-import com.klajdi.common.Job;
-import com.klajdi.scheduler.Scheduler;
-import com.klajdi.worker.WorkerNode;
+import com.klajdi.redis.RedisClient;
+import main.java.klajdi.com.common.Job;
+import main.java.klajdi.com.common.scheduler.Scheduler;
+import main.java.klajdi.com.common.worker.WorkerNode;
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) throws InterruptedException {
+
+        RedisClient redis = new RedisClient();
+        redis.getConnection().set("test", "hello");
+        System.out.println(redis.getConnection().get("test"));
+
 
         Scheduler scheduler = new Scheduler();
 
@@ -21,7 +27,7 @@ public class Main {
 
         scheduler.startMonitoring();
 
-        worker1.start();
+        // worker1.start();
         worker2.start();
     }
 }
