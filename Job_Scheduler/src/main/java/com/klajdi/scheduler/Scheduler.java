@@ -8,25 +8,38 @@ import java.util.Queue;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.klajdi.redis.RedisClient;
+import redis.clients.jedis.Jedis;
+
 public class Scheduler {
 
     public static final long WORKER_TIMEOUT_MS = 5000;
-    private Queue<Job> jobQueue = new LinkedList<>();
+    // private Queue<Job> jobQueue = new LinkedList<>();
     private Map<String, WorkerInfo> workers = new HashMap<>();
+    private Jedis redis = new RedisClient().getConnection();
+    public static final String JOB_QUEUE_KEY = "job_queue";
+
 
 
     public WorkerInfo getWorkerInfo(String workerId) {
         return workers.get(workerId);
     }
 
-    public void submitJob(Job job){
+    /*public void submitJob(Job job){
         jobQueue.add(job);
         System.out.println("Job submitted: " + job.getId());
+    }*/
+
+    public void submitJob(Job job) {
+        String serialized = job.getId() + "|" + job.getPayload();
+        redis.lpush(JOB_QUEUE_KEY, serialized);
+        System.out.println("Scheduler: Job submitted -> " + job.getId());
     }
 
-    public Job getNextJob(){
+
+   /* public Job getNextJob(){
         return jobQueue.poll();
-    }
+    }*/
 
     public void  registerWorker(String workerID){
         workers.put(workerID, new WorkerInfo(workerID));
@@ -56,7 +69,9 @@ public class Scheduler {
 
                 if(info.getCurrentJob() != null){
                     Job job = info.getCurrentJob();
-                    jobQueue.add(job);
+                    //jobQueue.add(job);
+                    redis.lpush(JOB_QUEUE_KEY, job.getId() + "|" + job.getPayload());
+
                     System.out.println("Scheduler: Requeued job " + job.getId() + " from dead worker " + workerId);
                     info.setCurrentJob(null);
                 }

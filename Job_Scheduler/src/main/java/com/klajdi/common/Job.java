@@ -1,4 +1,5 @@
 package main.java.klajdi.com.common;
+import main.java.klajdi.com.common.JobStatus;
 
 public class Job {
 

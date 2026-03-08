@@ -18,8 +18,10 @@ public class Main {
         scheduler.submitJob(new Job("job1", "payload1"));
         scheduler.submitJob(new Job("job2", "payload2"));
 
-        WorkerNode worker1 = new WorkerNode("worker-1", scheduler);
-        WorkerNode worker2 = new WorkerNode("worker-2", scheduler);
+       // WorkerNode worker1 = new WorkerNode("worker-1", scheduler);
+       // WorkerNode worker2 = new WorkerNode("worker-2", scheduler);
+        WorkerNode worker1 = new WorkerNode("worker-1");
+        WorkerNode worker2 = new WorkerNode("worker-2");
 
 
         scheduler.registerWorker("worker-1");

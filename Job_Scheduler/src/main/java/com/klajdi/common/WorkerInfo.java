@@ -1,4 +1,5 @@
 package main.java.klajdi.com.common;
+import main.java.klajdi.com.common.Job;
 
 public class WorkerInfo {
     private String id;
