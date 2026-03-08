@@ -29,7 +29,7 @@ public class Main {
 
         scheduler.startMonitoring();
 
-        // worker1.start();
+         worker1.start();
         worker2.start();
     }
 }

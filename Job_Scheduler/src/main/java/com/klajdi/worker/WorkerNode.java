@@ -22,81 +22,52 @@ public class WorkerNode {
     }
 
     public void sendHeartbeat() {
-        redis.setex("worker:" + id + ":heartbeat", 5, String.valueOf(System.currentTimeMillis()));
+        redis.setex("worker:" + id + ":heartbeat", 10, String.valueOf(System.currentTimeMillis()));
     }
-
-
-    /*public void sendHeartbeat(){
-        scheduler.hertbeat(id);
-    }*/
-
-  /*  public void pollForJobs(){
-        sendHeartbeat();
-        WorkerInfo info = scheduler.getWorkerInfo(id);
-        // Job job = scheduler.getNextJob();
-
-        if(job != null){
-            System.out.println("Worker " + id + " executing job: " + job.getId());
-            info.setCurrentJob(job);
-            job.setStatus(JobStatus.COMPLETED);
-
-            if (id.equals("worker-1")) {
-                System.out.println("Simulating worker-1 crash...");
-                return;
-            }
-
-            try{
-                Thread.sleep(3000);
-            }catch (InterruptedException e){
-                e.printStackTrace();
-            }
-
-            job.setStatus(JobStatus.COMPLETED);
-            info.setCurrentJob(null);
-
-        } else{
-            System.out.println("Worker " + id + "  didn't find this jobs.");
-            info.setCurrentJob(null);
-        }
-    }
-*/
 
     public void pollForJobs() {
-        // 1. Send heartbeat to Redis (5-second TTL)
-        redis.setex("worker:" + id + ":heartbeat", 5, String.valueOf(System.currentTimeMillis()));
+        // 1. Send heartbeat to Redis (10-second TTL)
+        redis.setex("worker:" + id + ":heartbeat", 10, String.valueOf(System.currentTimeMillis()));
 
         // 2. Block until a job arrives from Redis
         List<String> result = redis.brpop(0, JOB_QUEUE_KEY);
 
         if (result != null && result.size() > 1) {
-            // Deserialize job
             String serialized = result.get(1);
             String[] parts = serialized.split("\\|");
             Job job = new Job(parts[0], parts[1]);
 
             System.out.println("Worker " + id + " executing job: " + job.getId());
 
-            // 3. Mark job as running (optional for now)
+            // 3. Track current job in Redis for crash recovery
+            redis.set("worker:" + id + ":currentJob", serialized);
+
             job.setStatus(JobStatus.RUNNING);
 
-            // Simulate crash for worker-1
+            // 4. Simulate crash for worker-1
             if (id.equals("worker-1")) {
                 System.out.println("Simulating worker-1 crash...");
-                return; // Worker dies here
+                return;
             }
 
-            // 4. Simulate job execution
+            // 5. Heartbeat before the sleep so TTL resets during execution
+            sendHeartbeat();
+
+            // 6. Simulate job execution
             try {
                 Thread.sleep(3000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
-            // 5. Mark job completed
+            // 7. Mark job completed and clear current job
             job.setStatus(JobStatus.COMPLETED);
+            redis.del("worker:" + id + ":currentJob");
             System.out.println("Worker " + id + " completed job: " + job.getId());
+            sendHeartbeat();
         }
     }
+
 
     public void start(){
         new Thread(() -> {
